@@ -64,41 +64,59 @@ pub const BG3HOFS: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x400001C) };
 /// Topmost visible BG3 pixel (9-bits, tiled mode only).
 pub const BG3VOFS: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x400001E) };
 
-pub const BG2PA: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000020) };
+/// BG2 Affine Parameter A
+pub const BG2PA: WOVolAddress<FP_I_7_8> = unsafe { WOVolAddress::new(0x4000020) };
 
-pub const BG2PB: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000022) };
+/// BG2 Affine Parameter B
+pub const BG2PB: WOVolAddress<FP_I_7_8> = unsafe { WOVolAddress::new(0x4000022) };
 
-pub const BG2PC: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000024) };
+/// BG2 Affine Parameter C
+pub const BG2PC: WOVolAddress<FP_I_7_8> = unsafe { WOVolAddress::new(0x4000024) };
 
-pub const BG2PD: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000026) };
+/// BG2 Affine Parameter D
+pub const BG2PD: WOVolAddress<FP_I_7_8> = unsafe { WOVolAddress::new(0x4000026) };
 
-pub const BG2X: WOVolAddress<u32> = unsafe { WOVolAddress::new(0x4000028) };
+/// BG2 Reference X coordinate
+pub const BG2X: WOVolAddress<FP_I_19_8> = unsafe { WOVolAddress::new(0x4000028) };
 
-pub const BG2Y: VolAddress<u32> = unsafe { VolAddress::new(0x400002C) };
+/// BG2 Reference Y coordinate
+pub const BG2Y: WOVolAddress<FP_I_19_8> = unsafe { WOVolAddress::new(0x400002C) };
 
-pub const BG3PA: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000030) };
+/// BG3 Affine Parameter A
+pub const BG3PA: WOVolAddress<FP_I_7_8> = unsafe { WOVolAddress::new(0x4000030) };
 
-pub const BG3PB: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000032) };
+/// BG3 Affine Parameter B
+pub const BG3PB: WOVolAddress<FP_I_7_8> = unsafe { WOVolAddress::new(0x4000032) };
 
-pub const BG3PC: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000034) };
+/// BG3 Affine Parameter C
+pub const BG3PC: WOVolAddress<FP_I_7_8> = unsafe { WOVolAddress::new(0x4000034) };
 
-pub const BG3PD: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000036) };
+/// BG3 Affine Parameter D
+pub const BG3PD: WOVolAddress<FP_I_7_8> = unsafe { WOVolAddress::new(0x4000036) };
 
-pub const BG3X: WOVolAddress<u32> = unsafe { WOVolAddress::new(0x4000038) };
+/// BG3 Reference X coordinate
+pub const BG3X: WOVolAddress<FP_I_19_8> = unsafe { WOVolAddress::new(0x4000038) };
 
-pub const BG3Y: WOVolAddress<u32> = unsafe { WOVolAddress::new(0x400003C) };
+/// BG3 Reference Y coordinate
+pub const BG3Y: WOVolAddress<FP_I_19_8> = unsafe { WOVolAddress::new(0x400003C) };
 
-pub const WIN0H: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000040) };
+/// Horizontal position of Win0
+pub const WIN0H: WOVolAddress<WindowHorizontalSetting> = unsafe { WOVolAddress::new(0x4000040) };
 
-pub const WIN1H: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000042) };
+/// Horizontal position of Win1
+pub const WIN1H: WOVolAddress<WindowHorizontalSetting> = unsafe { WOVolAddress::new(0x4000042) };
 
-pub const WIN0V: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000044) };
+/// Vertical position of Win0
+pub const WIN0V: WOVolAddress<WindowVerticalSetting> = unsafe { WOVolAddress::new(0x4000044) };
 
-pub const WIN1V: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x4000046) };
+/// Vertical position of Win1
+pub const WIN1V: WOVolAddress<WindowVerticalSetting> = unsafe { WOVolAddress::new(0x4000046) };
 
-pub const WININ: VolAddress<u16> = unsafe { VolAddress::new(0x4000048) };
+/// Controls the appearance inside of Window0 and Window1
+pub const WININ: VolAddress<WindowInSetting> = unsafe { VolAddress::new(0x4000048) };
 
-pub const WINOUT: VolAddress<u16> = unsafe { VolAddress::new(0x400004A) };
+/// Controls the appearance Outside of Windows and of the OBJ Window
+pub const WINOUT: VolAddress<WindowOutSetting> = unsafe { VolAddress::new(0x400004A) };
 
 /// Allows control of the mosaic effect.
 pub const MOSAIC: WOVolAddress<MosaicSetting> = unsafe { WOVolAddress::new(0x400004C) };

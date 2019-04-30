@@ -21,7 +21,7 @@ before_script:
   - cargo install-update -a
 
 script:
-  # Run all verificaions, both debug and release
+  # Run all verifications, both debug and release
   - cargo test --lib
   - cargo test --lib --release
   - cargo test --tests

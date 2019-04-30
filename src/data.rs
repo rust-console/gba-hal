@@ -168,3 +168,163 @@ impl MosaicSetting {
     obj_vertical_inc: 12-15,
   }
 }
+
+newtype! {
+  /// A two-byte fixed point value.
+  ///
+  /// * Signed
+  /// * 7 integral bits
+  /// * 8 fractional bits (x/256)
+  #[allow(bad_style)]
+  FP_I_7_8, pub i16
+}
+
+newtype! {
+  /// A four-byte fixed point value.
+  ///
+  /// * Signed
+  /// * 19 integral bits (bits above are ignored)
+  /// * 8 fractional bits (x/256)
+  #[allow(bad_style)]
+  FP_I_19_8, pub i32
+}
+
+newtype! {
+  /// Horizontal control for Window effect.
+  ///
+  /// * x1: Leftmost window edge (8-bit)
+  /// * x2: Rightmost window edge +1 (8-bit)
+  WindowHorizontalSetting, u16
+}
+#[allow(missing_docs)]
+impl WindowHorizontalSetting {
+  phantom_fields! {
+    self.0: u16,
+    x1: 8-15,
+    x2: 0-7,
+  }
+}
+
+newtype! {
+  /// Vertical control for Window effect.
+  ///
+  /// * y1: Leftmost window edge (8-bit)
+  /// * y2: Rightmost window edge +1 (8-bit)
+  WindowVerticalSetting, u16
+}
+#[allow(missing_docs)]
+impl WindowVerticalSetting {
+  phantom_fields! {
+    self.0: u16,
+    y1: 8-15,
+    y2: 0-7,
+  }
+}
+
+newtype! {
+  /// Controls the interior of windows 0 and 1.
+  ///
+  /// * 0-3: Win0 BG0 through BG3 enable
+  /// * 4: Win0 OBJ enable
+  /// * 5: Win0 color special effect enable
+  /// * 8-11: Win0 BG0 through BG3 enable
+  /// * 12: Win0 OBJ enable
+  /// * 13: Win0 color special effect enable
+  WindowInSetting, u16
+}
+#[allow(missing_docs)]
+impl WindowInSetting {
+  phantom_fields! {
+    self.0: u16,
+    win0_bg0: 0,
+    win0_bg1: 1,
+    win0_bg2: 2,
+    win0_bg3: 3,
+    win0_obj: 4,
+    win0_color_effect: 5,
+    win1_bg0: 8,
+    win1_bg1: 9,
+    win1_bg2: 10,
+    win1_bg3: 11,
+    win1_obj: 12,
+    win1_color_effect: 13,
+  }
+}
+
+newtype! {
+  /// Controls outside of the windows and the OBJ window.
+  ///
+  /// * 0-3: Outside Window BG0 through BG3 enable
+  /// * 4: Outside Window OBJ enable
+  /// * 5: Outside Window color special effect enable
+  /// * 8-11: OBJ Window BG0 through BG3 enable
+  /// * 12: OBJ Window OBJ enable
+  /// * 13: OBJ Window color special effect enable
+  WindowOutSetting, u16
+}
+#[allow(missing_docs)]
+impl WindowOutSetting {
+  phantom_fields! {
+    self.0: u16,
+    outside_bg0: 0,
+    outside_bg1: 1,
+    outside_bg2: 2,
+    outside_bg3: 3,
+    outside_obj: 4,
+    outside_color_effect: 5,
+    win_obj_bg0: 8,
+    win_obj_bg1: 9,
+    win_obj_bg2: 10,
+    win_obj_bg3: 11,
+    win_obj_obj: 12,
+    win_obj_color_effect: 13,
+  }
+}
+
+newtype_enum! {
+  /// What color special effect to apply to selected pixels.
+  ColorSpecialEffect = u16,
+  /// No color effect.
+  None = 0,
+  /// 1st and 2nd targets mixed.
+  AlphaBlend = 1,
+  /// 1st target moves toward white
+  BrightnessIncrease = 2,
+  /// 2nd target moves toward black
+  BrightnessDecrease = 3,
+}
+
+newtype! {
+  /// Controls the color special effect
+  ///
+  /// * 0-5: 1st target pixel selections
+  /// * 6-7: color special effect
+  /// * 8-13: 2nd target pixel selections
+  ///
+  /// "1st target" picks the top-most pixel among the selections, and then "2nd
+  /// target" will pick the pixel underneath that. The "2nd target" only matters
+  /// if you've selected the AlphaBlend effect.
+  ///
+  /// For the names, note that BD = Backdrop (the color when nothing at all is
+  /// drawn from any background or object).
+  BlendControlSetting, u16
+}
+#[allow(missing_docs)]
+impl BlendControlSetting {
+  phantom_fields! {
+    self.0: u16,
+    bg0_1st_target: 0,
+    bg1_1st_target: 1,
+    bg2_1st_target: 2,
+    bg3_1st_target: 3,
+    obj_1st_target: 4,
+    bd_1st_target: 5,
+    color_special_effect: 6-7=ColorSpecialEffect<None, AlphaBlend, BrightnessIncrease, BrightnessDecrease>,
+    bg0_2nd_target: 8,
+    bg1_2nd_target: 9,
+    bg2_2nd_target: 10,
+    bg3_2nd_target: 11,
+    obj_2nd_target: 12,
+    bd_2nd_target: 13,
+  }
+}
