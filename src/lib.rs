@@ -16,6 +16,7 @@
 /// frills` to the invocation.
 ///
 /// ```no_run
+/// # use gba_hal::newtype;
 /// newtype! {
 ///   /// Records a particular key press combination.
 ///   KeyInput, u16
@@ -58,6 +59,7 @@ macro_rules! newtype {
 /// Debug, Clone, Copy, PartialEq, and Eq
 ///
 /// ```no_run
+/// # use gba_hal::newtype_enum;
 /// newtype_enum! {
 ///   /// The Foo
 ///   Foo = u16,
