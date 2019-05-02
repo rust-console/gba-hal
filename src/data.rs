@@ -328,3 +328,51 @@ impl BlendControlSetting {
     bd_2nd_target: 13,
   }
 }
+
+newtype! {
+  /// Controls alpha blend.
+  ///
+  /// Both fields are x/16, but values above 16 are capped at 16/16.
+  ///
+  /// For each color channel of an affected 1st target pixel with a valid 2nd
+  /// target pixel the final channel value is as follows:
+  ///
+  /// * `I = min(31, I_1st * EVA + I_2nd * EVB)`
+  ///
+  /// If the blend mode isn't set to `AlphaBlend`, or if the 1st target and 2nd
+  /// target combination isn't valid for this pixel location then this register
+  /// has no effect at all.
+  BlendAlphaSetting, u16
+}
+#[allow(missing_docs)]
+impl BlendAlphaSetting {
+  phantom_fields! {
+    self.0: u16,
+    eva_coefficient: 0-4,
+    evb_coefficient: 8-12,
+  }
+}
+
+newtype! {
+  /// Controls brightness blend.
+  ///
+  /// This is x/16, but values above 16 are capped at 16/16.
+  ///
+  /// For each color channel of an affected 1st target pixel the final channel
+  /// value is as follows:
+  ///
+  /// * **Increase:** `I = I_1st + (31 - I_1st) * EVY`
+  /// * **Decrease:** `I = I_1st - I_1st * EVY`
+  ///
+  /// If the blend mode isn't set to `BrightnessIncrease` or
+  /// `BrightnessDecrease` this register has no effect at all.
+  BlendBrightnessSetting, u16
+}
+#[allow(missing_docs)]
+impl BlendBrightnessSetting {
+  phantom_fields! {
+    self.0: u16,
+    evy_coefficient: 0-4,
+  }
+}
+
