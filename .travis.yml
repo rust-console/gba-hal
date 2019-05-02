@@ -13,18 +13,7 @@ branches:
 rust:
   - nightly
 
-before_script:
-  - rustup component add rust-src
-  - (test -x $HOME/.cargo/bin/cargo-install-update || cargo install cargo-update)
-  - (test -x $HOME/.cargo/bin/cargo-xbuild || cargo install cargo-xbuild)
-  - (test -x $HOME/.cargo/bin/cargo-make || cargo install cargo-make)
-  - cargo install-update -a
-
 script:
-  # Run all verifications, both debug and release
-  - cargo test --lib
-  - cargo test --lib --release
-  - cargo test --tests
-  - cargo test --tests --release
-  # Let cargo make take over the rest
-  - cargo make justrelease
+  - cargo build
+  - cargo test
+

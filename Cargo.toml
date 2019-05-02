@@ -16,7 +16,7 @@ voladdress = "0.2"
 gba-proc-macro = "0.6"
 
 [features]
-default = ["unsafe_docs_rs_mmio_listing_override"]
+default = []
 unsafe_docs_rs_mmio_listing_override = []
 
 [package.metadata.docs.rs]
