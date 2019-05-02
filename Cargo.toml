@@ -1,0 +1,23 @@
+[package]
+name = "gba-hal"
+description = "The bare bones hardware abstraction layer for the GBA"
+version = "0.0.1"
+authors = ["Lokathor <zefria@gmail.com>"]
+repository = "https://github.com/rust-console/gba-hal"
+readme = "README.md"
+keywords = ["gba", "hal"]
+edition = "2018"
+license = "Apache-2.0"
+
+publish = false
+
+[dependencies]
+voladdress = "0.2"
+gba-proc-macro = "0.6"
+
+[features]
+default = []
+unsafe_docs_rs_mmio_listing_override = []
+
+[package.metadata.docs.rs]
+features = "unsafe_docs_rs_mmio_listing_override"
