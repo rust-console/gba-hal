@@ -2,12 +2,20 @@
 use super::*;
 use typenum::consts::U8;
 
-pub const SOUND1CNT_L: VolAddress<u16> = unsafe { VolAddress::new(0x400_0060) };
-pub const SOUND1CNT_H: VolAddress<u16> = unsafe { VolAddress::new(0x400_0062) };
-pub const SOUND1CNT_X: VolAddress<u16> = unsafe { VolAddress::new(0x400_0064) };
+/// Pulse A: Sweep. GBATEK `SOUND1CNT_L`
+pub const PULSE_A_SWEEP: VolAddress<SweepSetting> = unsafe { VolAddress::new(0x400_0060) };
 
-pub const SOUND2CNT_L: VolAddress<u16> = unsafe { VolAddress::new(0x400_0068) };
-pub const SOUND2CNT_H: VolAddress<u16> = unsafe { VolAddress::new(0x400_006C) };
+/// Pulse A: Duty, Length, and Envelope. GBATEK `SOUND1CNT_H`
+pub const PULSE_A_EFFECTS: VolAddress<DutyLenEnvelopeSetting> = unsafe { VolAddress::new(0x400_0062) };
+
+/// Pulse A: Frequency and Master Controls. GBATEK `SOUND1CNT_X`
+pub const PULSE_A_FREQ_CTRL: VolAddress<FrequencyMasterControlSetting> = unsafe { VolAddress::new(0x400_0064) };
+
+/// Pulse B: Duty, Length, and Envelope. GBATEK `SOUND2CNT_L`
+pub const PULSE_B_EFFECTS: VolAddress<DutyLenEnvelopeSetting> = unsafe { VolAddress::new(0x400_0068) };
+
+/// Pulse B: Frequency and Master Controls. GBATEK `SOUND2CNT_H`
+pub const SOUND2CNT_H: VolAddress<FrequencyMasterControlSetting> = unsafe { VolAddress::new(0x400_006C) };
 
 pub const SOUND3CNT_L: VolAddress<u16> = unsafe { VolAddress::new(0x400_0070) };
 pub const SOUND3CNT_H: VolAddress<u16> = unsafe { VolAddress::new(0x400_0072) };

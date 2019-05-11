@@ -376,3 +376,76 @@ impl BlendBrightnessSetting {
   }
 }
 
+newtype! {
+  /// Controls the sweep effect (Pulse A only).
+  ///
+  /// * 0-2: Shift number
+  /// * 3: Sweep is decreasing or increasing
+  /// * 4-6: Time per sweep. Units of `x/128` sec aka `x * 7.8` ms
+  ///
+  /// If sweep is disabled by setting sweep time to 0, the sweep should also be
+  /// set to decreasing mode.
+  SweepSetting, u8
+}
+#[allow(missing_docs)]
+impl SweepSetting {
+  phantom_fields! {
+    self.0: u8,
+    shift_num: 0-2,
+    decreasing: 3,
+    timer: 4-6,
+  }
+}
+
+newtype_enum! {
+  /// How much of the pulse wave should be the "active" value.
+  PulseDutyPattern = u16,
+  /// 1/8th (12.5%)
+  Eighth = 0,
+  /// 1/4th (25%)
+  Quarter = 1,
+  /// 1/2 (50%)
+  Half = 2,
+  /// 3/4ths (75%). This sounds the same as the 25% mode.
+  ThreeQuarters = 3,
+}
+
+newtype! {
+  /// Combines the main pulse voice effects into a single setting.
+  /// 
+  /// * 0-5 (wo): Sound length, `(64-n)/256` seconds
+  /// * 6-7: Pulse Duty
+  /// * 8-10: Time per envelope step: `x/64` sec, or 0 for no envelope.
+  /// * 11: If the envelope is increasing or decreasing.
+  /// * 12-15: Initial envelope volume (0 = no sound)
+  DutyLenEnvelopeSetting, u16
+}
+#[allow(missing_docs)]
+impl DutyLenEnvelopeSetting {
+  phantom_fields! {
+    self.0: u16,
+    length: 0-5,
+    duty: 6-7=PulseDutyPattern<Eighth, Quarter, Half, ThreeQuarters>,
+    envelope_time: 8-10,
+    envelope_increasing: 11,
+    initial_volume: 12-15,
+  }
+}
+
+newtype! {
+  /// Frequency and master control settings
+  /// 
+  /// * 0-10 (wo): Frequency `131072/(2048-n)` Hz
+  /// * 14: Stop output when length expires
+  /// * 15 (wo): Initialize/restart this sound
+  FrequencyMasterControlSetting, u16
+}
+#[allow(missing_docs)]
+impl FrequencyMasterControlSetting {
+  phantom_fields! {
+    self.0: u16,
+    frequency: 0-10,
+    timeout_enabled: 14,
+    init_restart: 15,
+  }
+}
