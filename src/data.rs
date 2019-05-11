@@ -412,7 +412,7 @@ newtype_enum! {
 
 newtype! {
   /// Combines the main pulse voice effects into a single setting.
-  /// 
+  ///
   /// * 0-5 (wo): Sound length, `(64-n)/256` seconds
   /// * 6-7: Pulse Duty
   /// * 8-10: Time per envelope step: `x/64` sec, or 0 for no envelope.
@@ -434,18 +434,130 @@ impl DutyLenEnvelopeSetting {
 
 newtype! {
   /// Frequency and master control settings
-  /// 
+  ///
   /// * 0-10 (wo): Frequency `131072/(2048-n)` Hz
   /// * 14: Stop output when length expires
   /// * 15 (wo): Initialize/restart this sound
-  FrequencyMasterControlSetting, u16
+  PulseFrequencyControlSetting, u16
 }
 #[allow(missing_docs)]
-impl FrequencyMasterControlSetting {
+impl PulseFrequencyControlSetting {
   phantom_fields! {
     self.0: u16,
     frequency: 0-10,
     timeout_enabled: 14,
     init_restart: 15,
+  }
+}
+
+newtype! {
+  /// Controls how the Wave RAM is accessed, and if the sound plays at all.
+  ///
+  /// * 5: true, playback runs through both banks as a 64 digit loop. false,
+  ///   playback runs though just a single bank as a 32 digit loop.
+  /// * 6: true selects bank 1 for playback, false selects bank 0.
+  /// * 7: Wave sound is enabled.
+  WaveInitRAMControl, u8
+}
+#[allow(missing_docs)]
+impl WaveInitRAMControl {
+  phantom_fields! {
+    self.0: u8,
+    use_both_banks: 5,
+    use_bank_1: 6,
+    playback: 7,
+  }
+}
+
+newtype_enum! {
+  /// How loudly the Wave output should play
+  WaveVolume = u16,
+  /// No sound
+  Zero = 0,
+  /// 100% sound
+  Full = 1,
+  /// 50% sound
+  Half = 2,
+  /// 25% sound
+  Quarter = 3,
+}
+
+newtype! {
+  /// Length and Volume controls for the Wave output.
+  ///
+  /// * 0-7 (wo): Sound Length: `(256-n)/256` seconds
+  /// * 13-14: Volume Mode
+  /// * 15: Override above and use 75%
+  WaveLengthVolumeSetting, u16
+}
+#[allow(missing_docs)]
+impl WaveLengthVolumeSetting {
+  phantom_fields! {
+    self.0: u16,
+    length: 0-7,
+    volume: 13-14=WaveVolume<Zero, Full, Half, Quarter>,
+    override_75percent: 15,
+  }
+}
+
+newtype! {
+  /// Wave output frequency and master control settings.
+  ///
+  /// * 0-10 (wo): Sample Rate `2097152/(2048-n)` Hz
+  /// * 14: Stop output when length expires
+  /// * 15 (wo): Initialize / restart the sound.
+  WaveFrequencyControl, u16
+}
+#[allow(missing_docs)]
+impl WaveFrequencyControl {
+  phantom_fields! {
+    self.0: u16,
+    sample_rate: 0-10,
+    use_timeout: 14,
+    initialize: 15,
+  }
+}
+
+newtype! {
+  /// Length and envelope controls for the Noise output
+  ///
+  /// * 0-5 (wo): sound length `(64-n)/256` seconds
+  /// * 8-10: Envelope step time, `n/64` seconds, 0 for off.
+  /// * 11: Envelope increasing
+  /// * 12-15: Envelope initial volume
+  LengthEnvelopeSetting, u16
+}
+#[allow(missing_docs)]
+impl LengthEnvelopeSetting {
+  phantom_fields! {
+    self.0: u16,
+    length: 0-5,
+    step_time: 8-10,
+    envelope_increasing: 11,
+    initial_volume: 12-15,
+  }
+}
+
+newtype! {
+  /// Noise channel frequency and master control setting
+  ///
+  /// Frequency is `524288 / r / 2^(s+1)` Hz. For r=0 assume r=0.5 instead.
+  ///
+  /// * 0-2: divide ratio `r`
+  /// * 3: Use a 7-bit counter (true) or 15-bit counter (false)
+  /// * 4-7: shift clock frequency `s`
+  /// * 14: Stop output when length expires
+  /// * 15 (wo): Initialize / restart the sound.
+  NoiseFrequencyControl, u16
+}
+#[allow(missing_docs)]
+impl NoiseFrequencyControl {
+  phantom_fields! {
+    self.0: u16,
+    divide_ratio: 0-2,
+    counter_is_7bit: 3,
+    shift_clock_frequency: 4-7,
+    length_flag: 14,
+    initialize: 15,
   }
 }
