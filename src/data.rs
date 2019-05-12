@@ -376,3 +376,300 @@ impl BlendBrightnessSetting {
   }
 }
 
+newtype! {
+  /// Controls the sweep effect (Pulse A only).
+  ///
+  /// * 0-2: Shift number
+  /// * 3: Sweep is decreasing or increasing
+  /// * 4-6: Time per sweep. Units of `x/128` sec aka `x * 7.8` ms
+  ///
+  /// If sweep is disabled by setting sweep time to 0, the sweep should also be
+  /// set to decreasing mode.
+  SweepSetting, u8
+}
+#[allow(missing_docs)]
+impl SweepSetting {
+  phantom_fields! {
+    self.0: u8,
+    shift_num: 0-2,
+    decreasing: 3,
+    timer: 4-6,
+  }
+}
+
+newtype_enum! {
+  /// How much of the pulse wave should be the "active" value.
+  PulseDutyPattern = u16,
+  /// 1/8th (12.5%)
+  Eighth = 0,
+  /// 1/4th (25%)
+  Quarter = 1,
+  /// 1/2 (50%)
+  Half = 2,
+  /// 3/4ths (75%). This sounds the same as the 25% mode.
+  ThreeQuarters = 3,
+}
+
+newtype! {
+  /// Combines the main pulse voice effects into a single setting.
+  ///
+  /// * 0-5 (wo): Sound length, `(64-n)/256` seconds
+  /// * 6-7: Pulse Duty
+  /// * 8-10: Time per envelope step: `x/64` sec, or 0 for no envelope.
+  /// * 11: If the envelope is increasing or decreasing.
+  /// * 12-15: Initial envelope volume (0 = no sound)
+  DutyLenEnvelopeSetting, u16
+}
+#[allow(missing_docs)]
+impl DutyLenEnvelopeSetting {
+  phantom_fields! {
+    self.0: u16,
+    length: 0-5,
+    duty: 6-7=PulseDutyPattern<Eighth, Quarter, Half, ThreeQuarters>,
+    envelope_time: 8-10,
+    envelope_increasing: 11,
+    initial_volume: 12-15,
+  }
+}
+
+newtype! {
+  /// Frequency and master control settings
+  ///
+  /// * 0-10 (wo): Frequency `131072/(2048-n)` Hz
+  /// * 14: Stop output when length expires
+  /// * 15 (wo): Initialize/restart this sound
+  PulseFrequencyControlSetting, u16
+}
+#[allow(missing_docs)]
+impl PulseFrequencyControlSetting {
+  phantom_fields! {
+    self.0: u16,
+    frequency: 0-10,
+    timeout_enabled: 14,
+    init_restart: 15,
+  }
+}
+
+newtype! {
+  /// Controls how the Wave RAM is accessed, and if the sound plays at all.
+  ///
+  /// * 5: true, playback runs through both banks as a 64 digit loop. false,
+  ///   playback runs though just a single bank as a 32 digit loop.
+  /// * 6: true selects bank 1 for playback, false selects bank 0.
+  /// * 7: Wave sound is enabled.
+  WaveInitRAMControl, u8
+}
+#[allow(missing_docs)]
+impl WaveInitRAMControl {
+  phantom_fields! {
+    self.0: u8,
+    use_both_banks: 5,
+    use_bank_1: 6,
+    playback: 7,
+  }
+}
+
+newtype_enum! {
+  /// How loudly the Wave output should play
+  WaveVolume = u16,
+  /// No sound
+  Zero = 0,
+  /// 100% sound
+  Full = 1,
+  /// 50% sound
+  Half = 2,
+  /// 25% sound
+  Quarter = 3,
+}
+
+newtype! {
+  /// Length and Volume controls for the Wave output.
+  ///
+  /// * 0-7 (wo): Sound Length: `(256-n)/256` seconds
+  /// * 13-14: Volume Mode
+  /// * 15: Override above and use 75%
+  WaveLengthVolumeSetting, u16
+}
+#[allow(missing_docs)]
+impl WaveLengthVolumeSetting {
+  phantom_fields! {
+    self.0: u16,
+    length: 0-7,
+    volume: 13-14=WaveVolume<Zero, Full, Half, Quarter>,
+    override_75percent: 15,
+  }
+}
+
+newtype! {
+  /// Wave output frequency and master control settings.
+  ///
+  /// * 0-10 (wo): Sample Rate `2097152/(2048-n)` Hz
+  /// * 14: Stop output when length expires
+  /// * 15 (wo): Initialize / restart the sound.
+  WaveFrequencyControl, u16
+}
+#[allow(missing_docs)]
+impl WaveFrequencyControl {
+  phantom_fields! {
+    self.0: u16,
+    sample_rate: 0-10,
+    use_timeout: 14,
+    initialize: 15,
+  }
+}
+
+newtype! {
+  /// Length and envelope controls for the Noise output
+  ///
+  /// * 0-5 (wo): sound length `(64-n)/256` seconds
+  /// * 8-10: Envelope step time, `n/64` seconds, 0 for off.
+  /// * 11: Envelope increasing
+  /// * 12-15: Envelope initial volume
+  LengthEnvelopeSetting, u16
+}
+#[allow(missing_docs)]
+impl LengthEnvelopeSetting {
+  phantom_fields! {
+    self.0: u16,
+    length: 0-5,
+    step_time: 8-10,
+    envelope_increasing: 11,
+    initial_volume: 12-15,
+  }
+}
+
+newtype! {
+  /// Noise channel frequency and master control setting
+  ///
+  /// Frequency is `524288 / r / 2^(s+1)` Hz. For r=0 assume r=0.5 instead.
+  ///
+  /// * 0-2: divide ratio `r`
+  /// * 3: Use a 7-bit counter (true) or 15-bit counter (false)
+  /// * 4-7: shift clock frequency `s`
+  /// * 14: Stop output when length expires
+  /// * 15 (wo): Initialize / restart the sound.
+  NoiseFrequencyControl, u16
+}
+#[allow(missing_docs)]
+impl NoiseFrequencyControl {
+  phantom_fields! {
+    self.0: u16,
+    divide_ratio: 0-2,
+    counter_is_7bit: 3,
+    shift_clock_frequency: 4-7,
+    length_flag: 14,
+    initialize: 15,
+  }
+}
+
+newtype! {
+  /// Allows setting of the `SOUNDBIAS` register.
+  /// 
+  /// * 1-9: Bias level, defaults to 0x100
+  /// * 14-15: Amplitude resolution: 9 bits _minus_ this value.
+  Soundbias, u16
+}
+#[allow(missing_docs)]
+impl Soundbias {
+  phantom_fields! {
+    self.0: u16,
+    bias_level: 1-9,
+    amplitude_resolution: 14-15,
+  }
+}
+
+newtype! {
+  /// Controls left and right sound outputs.
+  /// 
+  /// * 0-2: Master Right Volume
+  /// * 4-6: Master Left Volume
+  /// * 8: Pulse A right
+  /// * 9: Pulse B right
+  /// * 10: Wave right
+  /// * 11: Noise right
+  /// * 12: Pulse A left
+  /// * 13: Pulse B left
+  /// * 14: Wave left
+  /// * 15: Noise left
+  StereoControl, u16
+}
+#[allow(missing_docs)]
+impl StereoControl {
+  phantom_fields! {
+    self.0: u16,
+    volume_right: 0-2,
+    volume_left: 4-6,
+    pulse_a_right: 8,
+    pulse_b_right: 9,
+    wave_right: 10,
+    noise_right: 11,
+    pulse_a_left: 12,
+    pulse_b_left: 13,
+    wave_left: 14,
+    noise_left: 15,
+  }
+}
+
+newtype_enum! {
+  /// How loudly the non-DMA sound should play
+  NonDMASoundVolume = u16,
+  /// 25% volume
+  Quarter = 0,
+  /// 50% volume
+  Half = 1,
+  /// 100% volume
+  Full = 2,
+}
+
+newtype! {
+  /// Controls DMA Sound mixing.
+  /// 
+  /// * 0-1: non-dma sound level: quarter, half, or full.
+  /// * 2: DMA sound A full (true) or half (false)
+  /// * 3: DMA sound B full (true) or half (false)
+  /// * 8: DMA sound A enabled right
+  /// * 9: DMA sound A enabled left
+  /// * 10: DMA sound A timer 1 (true) or timer 0 (false)
+  /// * 11 (wo): Reset FIFO A
+  /// * 12: DMA sound B enabled right
+  /// * 13: DMA sound B enabled left
+  /// * 14: DMA sound B timer 1 (true) or timer 0 (false)
+  /// * 15 (wo): Reset FIFO B
+  DMAMixer, u16
+}
+#[allow(missing_docs)]
+impl DMAMixer {
+  phantom_fields! {
+    self.0: u16,
+    non_dma_volume: 0-1=NonDMASoundVolume<Quarter,Half,Full>,
+    dma_a_full: 2,
+    dma_b_full: 3,
+    dma_a_right: 8,
+    dma_a_left: 9,
+    dma_a_timer1: 10,
+    dma_a_reset_fifo: 11,
+    dma_b_right: 12,
+    dma_b_left: 13,
+    dma_b_timer1: 14,
+    dma_b_reset_fifo: 15, 
+  }
+}
+
+newtype! {
+  /// Allows setting of the `SOUND_STATUS_ENABLE` register.
+  /// 
+  /// * 0 (ro): Pulse A is active
+  /// * 1 (ro): Pulse B is active
+  /// * 2 (ro): Wave is active
+  /// * 3 (ro): Noise is active
+  /// * 7: sound master enable
+  SoundStatusMaster, u16
+}
+#[allow(missing_docs)]
+impl SoundStatusMaster {
+  phantom_fields! {
+    self.0: u16,
+    bias_level: 1-9,
+    amplitude_resolution: 14-15,
+  }
+}

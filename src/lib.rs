@@ -16,7 +16,8 @@
 /// frills` to the invocation.
 ///
 /// ```no_run
-/// # use gba_hal::newtype;
+/// use gba_hal::newtype;
+///
 /// newtype! {
 ///   /// Records a particular key press combination.
 ///   KeyInput, u16

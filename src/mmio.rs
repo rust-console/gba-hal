@@ -10,7 +10,10 @@
 //! read or write using any address listed in this module.
 
 use crate::data::*;
-use voladdress::{read_only::ROVolAddress, write_only::WOVolAddress, VolAddress};
+use voladdress::{read_only::ROVolAddress, write_only::WOVolAddress, VolAddress, VolBlock};
 
 mod lcd;
 pub use lcd::*;
+
+mod sound;
+pub use sound::*;
