@@ -45,19 +45,48 @@ pub const NOISE_LENGTH_ENVELOPE: VolAddress<LengthEnvelopeSetting> =
   unsafe { VolAddress::new(0x400_0078) };
 
 /// Noise: Frequency and Master Control. GBATEK `SOUND4CNT_H`
-pub const SOUND4CNT_H: VolAddress<NoiseFrequencyControl> = unsafe { VolAddress::new(0x400_007C) };
+pub const NOISE_FREQUENCY: VolAddress<NoiseFrequencyControl> = unsafe { VolAddress::new(0x400_007C) };
 
 //
 
-pub const SOUNDCNT_L: VolAddress<u16> = unsafe { VolAddress::new(0x400_0080) };
-pub const SOUNDCNT_H: VolAddress<u16> = unsafe { VolAddress::new(0x400_0082) };
-pub const SOUNDCNT_X: VolAddress<u16> = unsafe { VolAddress::new(0x400_0084) };
+/// Stereo Controls. GBATEK `SOUNDCNT_L`.
+pub const STERO_CONTROL: VolAddress<StereoControl> = unsafe { VolAddress::new(0x400_0080) };
+
+/// Controls DMA sound mixing. GBATEK `SOUNDCNT_H`.
+pub const DMA_MIXER: VolAddress<DMAMixer> = unsafe { VolAddress::new(0x400_0082) };
+
+/// Sound status and sound master enable.
+///
+/// If sound is not enabled via this register, most sound registers are reset
+/// (if active) and unaccesable. The exceptions are `DMA_MIXER` and `SOUNDBIAS`.
+pub const SOUND_STATUS_ENABLE: VolAddress<SoundStatusMaster> = unsafe { VolAddress::new(0x400_0084) };
 
 //
 
-pub const SOUNDBIAS: VolAddress<u16> = unsafe { VolAddress::new(0x400_0088) };
+/// Controls final sound output. You can usually leave this at default.
+pub const SOUNDBIAS: VolAddress<Soundbias> = unsafe { VolAddress::new(0x400_0088) };
 
+/// The programmer-accessable wave ram data.
+///
+/// Note that there are two wave ram banks. At any given moment one of them is
+/// set for use as playback, and the other one will be accessable here. The
+/// playback bank is played by playing 4 bits as a single sample and then
+/// rotating the entire 128 bits of wave ram to put the next sample in place.
+/// Thus, when updating the wave ram you generally have to re-write all of the
+/// memory even if you only want a small change, because the loop will have been
+/// shifted around by some unknown amount.
 pub const WAVE_RAM: VolBlock<u16, U8> = unsafe { VolBlock::new(0x400_0090) };
 
-pub const FIFO_A: WOVolAddress<u32> = unsafe { WOVolAddress::new(0x400_00A0) };
-pub const FIFO_B: WOVolAddress<u32> = unsafe { WOVolAddress::new(0x400_00A4) };
+/// Input for DMA Sound Channel A.
+///
+/// This allows you to input 4 bytes at a time into DMA Sound A. There is an
+/// internal buffer of 32 bytes. Each byte is a single sound sample (`i8`).
+///
+/// Please see GBATEK for a full explanation of the (somewhat complicated)
+/// process of using the DMA sound outputs.
+pub const FIFO_A: WOVolAddress<[i8; 4]> = unsafe { WOVolAddress::new(0x400_00A0) };
+
+/// Input for DMA Sound Channel B.
+/// 
+/// As `FIFO_A`, but for DMA Sound B
+pub const FIFO_B: WOVolAddress<[i8; 4]> = unsafe { WOVolAddress::new(0x400_00A4) };

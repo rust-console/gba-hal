@@ -561,3 +561,115 @@ impl NoiseFrequencyControl {
     initialize: 15,
   }
 }
+
+newtype! {
+  /// Allows setting of the `SOUNDBIAS` register.
+  /// 
+  /// * 1-9: Bias level, defaults to 0x100
+  /// * 14-15: Amplitude resolution: 9 bits _minus_ this value.
+  Soundbias, u16
+}
+#[allow(missing_docs)]
+impl Soundbias {
+  phantom_fields! {
+    self.0: u16,
+    bias_level: 1-9,
+    amplitude_resolution: 14-15,
+  }
+}
+
+newtype! {
+  /// Controls left and right sound outputs.
+  /// 
+  /// * 0-2: Master Right Volume
+  /// * 4-6: Master Left Volume
+  /// * 8: Pulse A right
+  /// * 9: Pulse B right
+  /// * 10: Wave right
+  /// * 11: Noise right
+  /// * 12: Pulse A left
+  /// * 13: Pulse B left
+  /// * 14: Wave left
+  /// * 15: Noise left
+  StereoControl, u16
+}
+#[allow(missing_docs)]
+impl StereoControl {
+  phantom_fields! {
+    self.0: u16,
+    volume_right: 0-2,
+    volume_left: 4-6,
+    pulse_a_right: 8,
+    pulse_b_right: 9,
+    wave_right: 10,
+    noise_right: 11,
+    pulse_a_left: 12,
+    pulse_b_left: 13,
+    wave_left: 14,
+    noise_left: 15,
+  }
+}
+
+newtype_enum! {
+  /// How loudly the non-DMA sound should play
+  NonDMASoundVolume = u16,
+  /// 25% volume
+  Quarter = 0,
+  /// 50% volume
+  Half = 1,
+  /// 100% volume
+  Full = 2,
+}
+
+newtype! {
+  /// Controls DMA Sound mixing.
+  /// 
+  /// * 0-1: non-dma sound level: quarter, half, or full.
+  /// * 2: DMA sound A full (true) or half (false)
+  /// * 3: DMA sound B full (true) or half (false)
+  /// * 8: DMA sound A enabled right
+  /// * 9: DMA sound A enabled left
+  /// * 10: DMA sound A timer 1 (true) or timer 0 (false)
+  /// * 11 (wo): Reset FIFO A
+  /// * 12: DMA sound B enabled right
+  /// * 13: DMA sound B enabled left
+  /// * 14: DMA sound B timer 1 (true) or timer 0 (false)
+  /// * 15 (wo): Reset FIFO B
+  DMAMixer, u16
+}
+#[allow(missing_docs)]
+impl DMAMixer {
+  phantom_fields! {
+    self.0: u16,
+    non_dma_volume: 0-1=NonDMASoundVolume<Quarter,Half,Full>,
+    dma_a_full: 2,
+    dma_b_full: 3,
+    dma_a_right: 8,
+    dma_a_left: 9,
+    dma_a_timer1: 10,
+    dma_a_reset_fifo: 11,
+    dma_b_right: 12,
+    dma_b_left: 13,
+    dma_b_timer1: 14,
+    dma_b_reset_fifo: 15, 
+  }
+}
+
+newtype! {
+  /// Allows setting of the `SOUND_STATUS_ENABLE` register.
+  /// 
+  /// * 0 (ro): Pulse A is active
+  /// * 1 (ro): Pulse B is active
+  /// * 2 (ro): Wave is active
+  /// * 3 (ro): Noise is active
+  /// * 7: sound master enable
+  SoundStatusMaster, u16
+}
+#[allow(missing_docs)]
+impl SoundStatusMaster {
+  phantom_fields! {
+    self.0: u16,
+    bias_level: 1-9,
+    amplitude_resolution: 14-15,
+  }
+}
