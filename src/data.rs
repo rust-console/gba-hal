@@ -674,13 +674,74 @@ impl SoundStatusMaster {
   }
 }
 
-newtype! {
+newtype_enum! {
+  /// Controls the change in DMA destination address
+  DestAddressControl = u16,
+  #[allow(missing_docs)]
+  Increment = 0,
+  #[allow(missing_docs)]
+  Decrement = 1,
+  #[allow(missing_docs)]
+  Fixed = 2,
+  #[allow(missing_docs)]
+  IncrementReload = 3,
+}
+
+#[allow(missing_docs)]
+newtype_enum! {
+  /// Controls the change in DMA source address
+  SourceAddressControl = u16,
+  #[allow(missing_docs)]
+  Increment = 0,
+  #[allow(missing_docs)]
+  Decrement = 1,
+  #[allow(missing_docs)]
+  Fixed = 2,
+}
+
+#[allow(missing_docs)]
+newtype_enum! {
+  /// Controls DMA starting time
+  StartTiming = u16,
+  /// This actually takes 2 clock cycles
+  Immediately = 0,
+  /// Trigger on VBlank
+  VBlank = 1,
+  /// Trigger on HBlank
+  HBlank = 2,
+  /// Varies by DMA unit:
   ///
+  /// * 0: Prohibited
+  /// * 1 or 2: Sound FIFO
+  /// * 3: Video Capture
+  Special = 3,
+}
+
+newtype! {
+  /// Configures a DMA unit.
+  ///
+  /// * 5-6: destination address control
+  /// * 7-8: source address control
+  /// * 9: DMA repeat
+  /// * 10: DMA transfer type
+  /// * 12-13: DMA start timing
+  /// * 14: Interrupt when DMA ends
+  /// * 15: DMA Enable
+  ///
+  /// DRQ is only for special game pak units, and so it isn't supported by this
+  /// type.
   DMAControl, u16
 }
 #[allow(missing_docs)]
 impl DMAControl {
   phantom_fields! {
     self.0: u16,
+    dest_address_ctrl: 5-6=DestAddressControl<Increment, Decrement, Fixed, IncrementReload>,
+    src_address_ctrl: 7-8=SourceAddressControl<Increment, Decrement, Fixed>,
+    dma_repeats: 9,
+    dma_is_32bit: 10,
+    dma_start_time: 12-13=StartTiming<Immediately, VBlank, HBlank, Special>,
+    irq_at_end: 14,
+    dma_enable: 15,
   }
 }
