@@ -4,13 +4,13 @@ use super::*;
 /// The core display control register.
 ///
 /// Sets the visual mode as well as which layers to display.
-pub const DISPCNT: VolAddress<DisplayControlSetting> = unsafe { VolAddress::new(0x400_0000) };
+pub const DISPCNT: VolAddress<DisplayControl> = unsafe { VolAddress::new(0x400_0000) };
 
 /// Display status and interrupt control register.
 ///
 /// This is only partly read/write, some fields are read only, see the setting
 /// type for more info.
-pub const DISPSTAT: VolAddress<DisplayStatusSetting> = unsafe { VolAddress::new(0x400_0004) };
+pub const DISPSTAT: VolAddress<DisplayStatus> = unsafe { VolAddress::new(0x400_0004) };
 
 /// The current scanline being processed.
 ///
@@ -18,16 +18,16 @@ pub const DISPSTAT: VolAddress<DisplayStatusSetting> = unsafe { VolAddress::new(
 pub const VCOUNT: ROVolAddress<u16> = unsafe { ROVolAddress::new(0x400_0006) };
 
 /// Configuration for BG0
-pub const BG0CNT: VolAddress<BackgroundControlSetting> = unsafe { VolAddress::new(0x400_0008) };
+pub const BG0CNT: VolAddress<BackgroundControl> = unsafe { VolAddress::new(0x400_0008) };
 
 /// Configuration for BG1
-pub const BG1CNT: VolAddress<BackgroundControlSetting> = unsafe { VolAddress::new(0x400_000A) };
+pub const BG1CNT: VolAddress<BackgroundControl> = unsafe { VolAddress::new(0x400_000A) };
 
 /// Configuration for BG2
-pub const BG2CNT: VolAddress<BackgroundControlSetting> = unsafe { VolAddress::new(0x400_000C) };
+pub const BG2CNT: VolAddress<BackgroundControl> = unsafe { VolAddress::new(0x400_000C) };
 
 /// Configuration for BG3
-pub const BG3CNT: VolAddress<BackgroundControlSetting> = unsafe { VolAddress::new(0x400_000E) };
+pub const BG3CNT: VolAddress<BackgroundControl> = unsafe { VolAddress::new(0x400_000E) };
 
 /// Leftmost visible BG0 pixel (9-bits, tiled mode only).
 pub const BG0HOFS: WOVolAddress<u16> = unsafe { WOVolAddress::new(0x400_0010) };
@@ -90,31 +90,31 @@ pub const BG3X: WOVolAddress<FP_I_19_8> = unsafe { WOVolAddress::new(0x400_0038)
 pub const BG3Y: WOVolAddress<FP_I_19_8> = unsafe { WOVolAddress::new(0x400_003C) };
 
 /// Horizontal position of Win0
-pub const WIN0H: WOVolAddress<WindowHorizontalSetting> = unsafe { WOVolAddress::new(0x400_0040) };
+pub const WIN0H: WOVolAddress<WindowHorizontal> = unsafe { WOVolAddress::new(0x400_0040) };
 
 /// Horizontal position of Win1
-pub const WIN1H: WOVolAddress<WindowHorizontalSetting> = unsafe { WOVolAddress::new(0x400_0042) };
+pub const WIN1H: WOVolAddress<WindowHorizontal> = unsafe { WOVolAddress::new(0x400_0042) };
 
 /// Vertical position of Win0
-pub const WIN0V: WOVolAddress<WindowVerticalSetting> = unsafe { WOVolAddress::new(0x400_0044) };
+pub const WIN0V: WOVolAddress<WindowVertical> = unsafe { WOVolAddress::new(0x400_0044) };
 
 /// Vertical position of Win1
-pub const WIN1V: WOVolAddress<WindowVerticalSetting> = unsafe { WOVolAddress::new(0x400_0046) };
+pub const WIN1V: WOVolAddress<WindowVertical> = unsafe { WOVolAddress::new(0x400_0046) };
 
 /// Controls the appearance inside of Window0 and Window1
-pub const WININ: VolAddress<WindowInSetting> = unsafe { VolAddress::new(0x400_0048) };
+pub const WININ: VolAddress<WindowIn> = unsafe { VolAddress::new(0x400_0048) };
 
 /// Controls the appearance Outside of Windows and of the OBJ Window
-pub const WINOUT: VolAddress<WindowOutSetting> = unsafe { VolAddress::new(0x400_004A) };
+pub const WINOUT: VolAddress<WindowOut> = unsafe { VolAddress::new(0x400_004A) };
 
 /// Allows control of the mosaic effect.
-pub const MOSAIC: WOVolAddress<MosaicSetting> = unsafe { WOVolAddress::new(0x400_004C) };
+pub const MOSAIC: WOVolAddress<Mosaic> = unsafe { WOVolAddress::new(0x400_004C) };
 
 /// Overall configuration of color blending (see also `BLDALPHA` and `BLDY`)
-pub const BLDCNT: VolAddress<BlendControlSetting> = unsafe { VolAddress::new(0x400_0050) };
+pub const BLDCNT: VolAddress<BlendControl> = unsafe { VolAddress::new(0x400_0050) };
 
 /// Configures alpha blending.
-pub const BLDALPHA: VolAddress<BlendAlphaSetting> = unsafe { VolAddress::new(0x400_0052) };
+pub const BLDALPHA: VolAddress<BlendAlpha> = unsafe { VolAddress::new(0x400_0052) };
 
 /// Configures brightness blending.
-pub const BLDY: WOVolAddress<BlendBrightnessSetting> = unsafe { WOVolAddress::new(0x400_0054) };
+pub const BLDY: WOVolAddress<BlendBrightness> = unsafe { WOVolAddress::new(0x400_0054) };

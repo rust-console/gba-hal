@@ -45,7 +45,7 @@ newtype_enum! {
 }
 
 newtype!(
-  /// Setting for the display control register.
+  /// Configuration for the display control register.
   ///
   /// * 0-2: `DisplayMode`
   /// * 3: CGB mode flag
@@ -61,11 +61,11 @@ newtype!(
   /// * 13: Window 0 display
   /// * 14: Window 1 display
   /// * 15: Object window
-  DisplayControlSetting,
+  DisplayControl,
   u16
 );
 #[allow(missing_docs)]
-impl DisplayControlSetting {
+impl DisplayControl {
   phantom_fields! {
     self.0: u16,
     mode: 0-2=DisplayMode<Mode0, Mode1, Mode2, Mode3, Mode4, Mode5>,
@@ -97,11 +97,11 @@ newtype!(
   ///
   /// "Although the drawing time is only 960 cycles (240*4), the H-Blank flag is
   /// "0" for a total of 1006 cycles." -gbatek
-  DisplayStatusSetting,
+  DisplayStatus,
   u16
 );
 #[allow(missing_docs)]
-impl DisplayStatusSetting {
+impl DisplayStatus {
   phantom_fields! {
     self.0: u16,
     vblank_flag: 0,
@@ -124,10 +124,10 @@ newtype! {
   /// Bit 8-12: Screen Base Block (0 through 31, 2k each)
   /// Bit 13: Display area overflow wraps (otherwise transparent, affine BG only)
   /// Bit 14-15: Screen Size (details depend on Text/Affine mode)
-  BackgroundControlSetting, u16
+  BackgroundControl, u16
 }
 #[allow(missing_docs)]
-impl BackgroundControlSetting {
+impl BackgroundControl {
   phantom_fields! {
     self.0: u16,
     bg_priority: 0-1,
@@ -156,10 +156,10 @@ newtype! {
   /// * Bits 4-7: BG mosaic vertical increase
   /// * Bits 8-11: Object mosaic horizontal increase
   /// * Bits 12-15: Object mosaic vertical increase
-  MosaicSetting, u16
+  Mosaic, u16
 }
 #[allow(missing_docs)]
-impl MosaicSetting {
+impl Mosaic {
   phantom_fields! {
     self.0: u16,
     bg_horizontal_inc: 0-3,
@@ -194,10 +194,10 @@ newtype! {
   ///
   /// * x1: Leftmost window edge (8-bit)
   /// * x2: Rightmost window edge +1 (8-bit)
-  WindowHorizontalSetting, u16
+  WindowHorizontal, u16
 }
 #[allow(missing_docs)]
-impl WindowHorizontalSetting {
+impl WindowHorizontal {
   phantom_fields! {
     self.0: u16,
     x1: 8-15,
@@ -210,10 +210,10 @@ newtype! {
   ///
   /// * y1: Leftmost window edge (8-bit)
   /// * y2: Rightmost window edge +1 (8-bit)
-  WindowVerticalSetting, u16
+  WindowVertical, u16
 }
 #[allow(missing_docs)]
-impl WindowVerticalSetting {
+impl WindowVertical {
   phantom_fields! {
     self.0: u16,
     y1: 8-15,
@@ -230,10 +230,10 @@ newtype! {
   /// * 8-11: Win0 BG0 through BG3 enable
   /// * 12: Win0 OBJ enable
   /// * 13: Win0 color special effect enable
-  WindowInSetting, u16
+  WindowIn, u16
 }
 #[allow(missing_docs)]
-impl WindowInSetting {
+impl WindowIn {
   phantom_fields! {
     self.0: u16,
     win0_bg0: 0,
@@ -260,10 +260,10 @@ newtype! {
   /// * 8-11: OBJ Window BG0 through BG3 enable
   /// * 12: OBJ Window OBJ enable
   /// * 13: OBJ Window color special effect enable
-  WindowOutSetting, u16
+  WindowOut, u16
 }
 #[allow(missing_docs)]
-impl WindowOutSetting {
+impl WindowOut {
   phantom_fields! {
     self.0: u16,
     outside_bg0: 0,
@@ -307,10 +307,10 @@ newtype! {
   ///
   /// For the names, note that BD = Backdrop (the color when nothing at all is
   /// drawn from any background or object).
-  BlendControlSetting, u16
+  BlendControl, u16
 }
 #[allow(missing_docs)]
-impl BlendControlSetting {
+impl BlendControl {
   phantom_fields! {
     self.0: u16,
     bg0_1st_target: 0,
@@ -342,10 +342,10 @@ newtype! {
   /// If the blend mode isn't set to `AlphaBlend`, or if the 1st target and 2nd
   /// target combination isn't valid for this pixel location then this register
   /// has no effect at all.
-  BlendAlphaSetting, u16
+  BlendAlpha, u16
 }
 #[allow(missing_docs)]
-impl BlendAlphaSetting {
+impl BlendAlpha {
   phantom_fields! {
     self.0: u16,
     eva_coefficient: 0-4,
@@ -366,10 +366,10 @@ newtype! {
   ///
   /// If the blend mode isn't set to `BrightnessIncrease` or
   /// `BrightnessDecrease` this register has no effect at all.
-  BlendBrightnessSetting, u16
+  BlendBrightness, u16
 }
 #[allow(missing_docs)]
-impl BlendBrightnessSetting {
+impl BlendBrightness {
   phantom_fields! {
     self.0: u16,
     evy_coefficient: 0-4,
@@ -385,10 +385,10 @@ newtype! {
   ///
   /// If sweep is disabled by setting sweep time to 0, the sweep should also be
   /// set to decreasing mode.
-  SweepSetting, u8
+  Sweep, u8
 }
 #[allow(missing_docs)]
-impl SweepSetting {
+impl Sweep {
   phantom_fields! {
     self.0: u8,
     shift_num: 0-2,
@@ -418,10 +418,10 @@ newtype! {
   /// * 8-10: Time per envelope step: `x/64` sec, or 0 for no envelope.
   /// * 11: If the envelope is increasing or decreasing.
   /// * 12-15: Initial envelope volume (0 = no sound)
-  DutyLenEnvelopeSetting, u16
+  DutyLenEnvelope, u16
 }
 #[allow(missing_docs)]
-impl DutyLenEnvelopeSetting {
+impl DutyLenEnvelope {
   phantom_fields! {
     self.0: u16,
     length: 0-5,
@@ -438,10 +438,10 @@ newtype! {
   /// * 0-10 (wo): Frequency `131072/(2048-n)` Hz
   /// * 14: Stop output when length expires
   /// * 15 (wo): Initialize/restart this sound
-  PulseFrequencyControlSetting, u16
+  PulseFrequencyControl, u16
 }
 #[allow(missing_docs)]
-impl PulseFrequencyControlSetting {
+impl PulseFrequencyControl {
   phantom_fields! {
     self.0: u16,
     frequency: 0-10,
@@ -488,10 +488,10 @@ newtype! {
   /// * 0-7 (wo): Sound Length: `(256-n)/256` seconds
   /// * 13-14: Volume Mode
   /// * 15: Override above and use 75%
-  WaveLengthVolumeSetting, u16
+  WaveLengthVolume, u16
 }
 #[allow(missing_docs)]
-impl WaveLengthVolumeSetting {
+impl WaveLengthVolume {
   phantom_fields! {
     self.0: u16,
     length: 0-7,
@@ -525,10 +525,10 @@ newtype! {
   /// * 8-10: Envelope step time, `n/64` seconds, 0 for off.
   /// * 11: Envelope increasing
   /// * 12-15: Envelope initial volume
-  LengthEnvelopeSetting, u16
+  LengthEnvelope, u16
 }
 #[allow(missing_docs)]
-impl LengthEnvelopeSetting {
+impl LengthEnvelope {
   phantom_fields! {
     self.0: u16,
     length: 0-5,
@@ -564,7 +564,7 @@ impl NoiseFrequencyControl {
 
 newtype! {
   /// Allows setting of the `SOUNDBIAS` register.
-  /// 
+  ///
   /// * 1-9: Bias level, defaults to 0x100
   /// * 14-15: Amplitude resolution: 9 bits _minus_ this value.
   Soundbias, u16
@@ -580,7 +580,7 @@ impl Soundbias {
 
 newtype! {
   /// Controls left and right sound outputs.
-  /// 
+  ///
   /// * 0-2: Master Right Volume
   /// * 4-6: Master Left Volume
   /// * 8: Pulse A right
@@ -623,7 +623,7 @@ newtype_enum! {
 
 newtype! {
   /// Controls DMA Sound mixing.
-  /// 
+  ///
   /// * 0-1: non-dma sound level: quarter, half, or full.
   /// * 2: DMA sound A full (true) or half (false)
   /// * 3: DMA sound B full (true) or half (false)
@@ -651,13 +651,13 @@ impl DMAMixer {
     dma_b_right: 12,
     dma_b_left: 13,
     dma_b_timer1: 14,
-    dma_b_reset_fifo: 15, 
+    dma_b_reset_fifo: 15,
   }
 }
 
 newtype! {
   /// Allows setting of the `SOUND_STATUS_ENABLE` register.
-  /// 
+  ///
   /// * 0 (ro): Pulse A is active
   /// * 1 (ro): Pulse B is active
   /// * 2 (ro): Wave is active
@@ -671,5 +671,16 @@ impl SoundStatusMaster {
     self.0: u16,
     bias_level: 1-9,
     amplitude_resolution: 14-15,
+  }
+}
+
+newtype! {
+  ///
+  DMAControl, u16
+}
+#[allow(missing_docs)]
+impl DMAControl {
+  phantom_fields! {
+    self.0: u16,
   }
 }
