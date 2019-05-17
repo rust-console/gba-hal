@@ -17,3 +17,6 @@ pub use lcd::*;
 
 mod sound;
 pub use sound::*;
+
+mod dma;
+pub use dma::*;
