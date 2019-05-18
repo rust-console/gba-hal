@@ -699,7 +699,6 @@ newtype_enum! {
   Fixed = 2,
 }
 
-#[allow(missing_docs)]
 newtype_enum! {
   /// Controls DMA starting time
   StartTiming = u16,
@@ -743,5 +742,43 @@ impl DMAControl {
     dma_start_time: 12-13=StartTiming<Immediately, VBlank, HBlank, Special>,
     irq_at_end: 14,
     dma_enable: 15,
+  }
+}
+
+newtype_enum! {
+  /// Controls DMA starting time
+  TimerTickRate = u8,
+  /// Once every CPU cycle
+  CPU1 = 0,
+  /// Once per 64 CPU cycles
+  CPU64 = 1,
+  /// Once per 256 CPU cycles
+  CPU256 = 2,
+  /// Once per 1,024 CPU cycles
+  CPU1024 = 3,
+}
+
+newtype! {
+  /// Controls one of the four Timer units.
+  ///
+  /// * 0-1: Tick however many CPU cycles
+  /// * 2: Instead of above, tick once per lower timer overflow (useless with
+  ///   Timer0).
+  /// * 6: Interrupt when this timer overflows
+  /// * 7: Enable bit.
+  ///
+  /// Each timer also has a "reload" (WO) and "counter" (RO). A timer's "reload"
+  /// value gets copied into the "counter" value every time that it overflows,
+  /// or any time that the enable bit goes from 0 to 1.
+  TimerControl, u8
+}
+#[allow(missing_docs)]
+impl TimerControl {
+  phantom_fields! {
+    self.0: u8,
+    tick_rate: 0-1=TimerTickRate<CPU1, CPU64, CPU256, CPU1024>,
+    cascade: 2,
+    overflow_irq: 6,
+    enabled: 7,
   }
 }

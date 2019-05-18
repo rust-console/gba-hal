@@ -20,3 +20,6 @@ pub use sound::*;
 
 mod dma;
 pub use dma::*;
+
+mod timers;
+pub use timers::*;
