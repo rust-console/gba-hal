@@ -7,14 +7,12 @@ use super::*;
 /// yourself, if you choose to.
 pub const IME_ADDRESS: usize = 0x4_000_208;
 
-/// Private! See `IME_set`
+/// Private! See `enable_interrupts`
 const IME: VolAddress<u8> = unsafe { VolAddress::new(IME_ADDRESS) };
 
 /// Interrupt Master Enable.
 ///
 /// This controls if interrupts can happen _at all_.
-///
-/// * 0 for no, 1 for yes, other bits are ignored.
 ///
 /// # Safety
 ///
@@ -29,8 +27,13 @@ const IME: VolAddress<u8> = unsafe { VolAddress::new(IME_ADDRESS) };
 /// via some known volatile address(s) that hold the information to pass between
 /// them.
 #[allow(bad_style)]
-pub unsafe fn IME_set(bit: u8) {
-  IME.write(bit);
+pub unsafe fn enable_interrupts(yes: bool) {
+  IME.write(yes as u8);
+}
+
+/// Reads if interrupts are currently enabled.
+pub fn interrupts_are_enabled() -> bool {
+  unsafe { core::mem::transmute(IME.read() & 0b1) }
 }
 
 /// Interrupt Enable, see the type for info.
