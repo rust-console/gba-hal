@@ -10,25 +10,34 @@ pub const IME_ADDRESS: usize = 0x4_000_208;
 /// Private! See `enable_interrupts`
 const IME: VolAddress<u8> = unsafe { VolAddress::new(IME_ADDRESS) };
 
-/// Interrupt Master Enable.
-///
-/// This controls if interrupts can happen _at all_.
+/// This activates the ability for interrupts to fire _at all_. GBATEK `IME`
 ///
 /// # Safety
 ///
 /// When an interrupt fires and the interrupt handler runs, that's _basically_
 /// an FFI call, from the Rust perspective. Rust can't analyze that ASM code and
 /// so on. So there has to be something marked as `unsafe`, and we choose to
-/// mark this as being the point of unsafety. For this to be safe, you have to
-/// have compiled in an interrupt handler that doesn't break any of the
-/// assumptions that Rust has about the memory that it's working with.
+/// mark this as being the point of unsafety.
 ///
-/// If necessary, the interrupt handler can communicate with the main program
-/// via some known volatile address(s) that hold the information to pass between
-/// them.
-#[allow(bad_style)]
-pub unsafe fn enable_interrupts(yes: bool) {
-  IME.write(yes as u8);
+/// Once interrupts are on there's a lot of things your ASM interrupt handler
+/// could do to mess up the safe Rust code, and we're trusting you to not do any
+/// of those things.
+///
+/// You have to have linked your program with an interrupt handler that doesn't
+/// break any of the assumptions that Rust has about the memory that it's
+/// working with. If necessary, the interrupt handler can communicate with the
+/// main program via some known volatile address (or addresses) that hold the
+/// information to pass between them.
+pub unsafe fn enable_interrupts() {
+  IME.write(1);
+}
+
+/// Prevents all interrupts from firing.
+///
+/// It's always safe to _turn off_ interrupts, it's just not safe to turn them
+/// on.
+pub fn disable_interrupts() {
+  IME.write(0);
 }
 
 /// Reads if interrupts are currently enabled.
