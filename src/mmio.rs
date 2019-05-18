@@ -26,3 +26,6 @@ pub use timers::*;
 
 mod keypad;
 pub use keypad::*;
+
+mod irq;
+pub use irq::*;

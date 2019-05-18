@@ -852,3 +852,88 @@ impl KeyControl {
     require_all_selected_keys: 15,
   }
 }
+
+newtype! {
+  /// This controls what types of interrupts can fire.
+  ///
+  /// Note that for each type of interrupt given here, there's also an interrupt
+  /// flag in that item's IO control registers. For example, there's a VBlank
+  /// interrupt flag here, and another VBlank interrupt flag in the
+  /// [DisplayStatus](DisplayStatus). The locations vary by interrupt category.
+  ///
+  /// In any case, BOTH flags have to be set (as well as `IME`) for the
+  /// interrupt to _actually_ happen at the appropriate time.
+  ///
+  /// * 0: VBlank
+  /// * 1: HBlank
+  /// * 2: VCounter Match
+  /// * 3: Timer 0 Overflow
+  /// * 4: Timer 1 Overflow
+  /// * 5: Timer 2 Overflow
+  /// * 6: Timer 3 Overflow
+  /// * 7: Serial Communication
+  /// * 8: DMA 0 Completed
+  /// * 9: DMA 1 Completed
+  /// * 10: DMA 2 Completed
+  /// * 11: DMA 3 Completed
+  /// * 12: Keypad
+  /// * 13: Game Pak
+  InterruptEnable, u16
+}
+#[allow(missing_docs)]
+impl InterruptEnable {
+  phantom_fields! {
+    self.0: u16,
+    vblank: 0,
+    hblank: 1,
+    vcounter: 2,
+    timer0: 3,
+    timer1: 4,
+    timer2: 5,
+    timer3: 6,
+    serial: 7,
+    dma0: 8,
+    dma1: 9,
+    dma2: 10,
+    dma3: 11,
+    keypad: 12,
+    game_pak: 13,
+  }
+}
+
+newtype! {
+  /// Interrupt Requested Flags. GBATEK `IF` register.
+  ///
+  /// This has the same bit layout as the [InterruptEnable](InterruptEnable)
+  /// type, but this type is used to either check what interrupts are pending
+  /// (`IRQ_PENDING`) or acknowledge an interrupt as processed
+  /// (`IRQ_ACKNOWLEDGE`).
+  ///
+  /// It may seem strange, but to acknowledge an interrupt as having been
+  /// processed, you need to **set** that bit (and only that bit), even though
+  /// it's already an active bit.
+  ///
+  /// The full story of how to do interrupt handling properly is beyond the
+  /// scope of this comment, but that's the basics.
+  InterruptRequestFlags, u16
+}
+#[allow(missing_docs)]
+impl InterruptRequestFlags {
+  phantom_fields! {
+    self.0: u16,
+    vblank: 0,
+    hblank: 1,
+    vcounter: 2,
+    timer0: 3,
+    timer1: 4,
+    timer2: 5,
+    timer3: 6,
+    serial: 7,
+    dma0: 8,
+    dma1: 9,
+    dma2: 10,
+    dma3: 11,
+    keypad: 12,
+    game_pak: 13,
+  }
+}
