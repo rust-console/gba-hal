@@ -23,3 +23,6 @@ pub use dma::*;
 
 mod timers;
 pub use timers::*;
+
+mod keypad;
+pub use keypad::*;

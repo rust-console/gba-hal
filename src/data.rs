@@ -782,3 +782,73 @@ impl TimerControl {
     enabled: 7,
   }
 }
+
+newtype! {
+  /// This is the GBA's _native_ key reading value.
+  ///
+  /// The term "native" here means "low-active". In other words, `false` ==
+  /// "pressed", and `true` is "released".
+  ///
+  /// The bits are as follows:
+  ///
+  /// * 0: a
+  /// * 1: b
+  /// * 2: select
+  /// * 3: start
+  /// * 4: right
+  /// * 5: left
+  /// * 6: up
+  /// * 7: down
+  /// * 8: r
+  /// * 9: l
+  KeyInput, u16
+}
+#[allow(missing_docs)]
+impl KeyInput {
+  phantom_fields! {
+    self.0: u16,
+    a_released: 0,
+    b_released: 1,
+    select_released: 2,
+    start_released: 3,
+    right_released: 4,
+    left_released: 5,
+    up_released: 6,
+    down_released: 7,
+    r_released: 8,
+    l_released: 9,
+  }
+}
+
+newtype! {
+  /// Affects when a key interrupt is triggered.
+  ///
+  /// This is intended for bringing the GBA out of the very-low-power mode, not
+  /// for general input.
+  ///
+  /// * There's one bit per button, matching the bits of the
+  ///   [KeyInput](KeyInput) type.
+  /// * 14: Key interrupts enabled
+  /// * 15: `true` if all selected keys must be pressed to trigger the interrupt
+  ///   (Logical AND), `false` if any selected key can be pressed to trigger the
+  ///   interrupt (Logical OR).
+  KeyControl, u16
+}
+#[allow(missing_docs)]
+impl KeyControl {
+  phantom_fields! {
+    self.0: u16,
+    a: 0,
+    b: 1,
+    select: 2,
+    start: 3,
+    right: 4,
+    left: 5,
+    up: 6,
+    down: 7,
+    r: 8,
+    l: 9,
+    irq_enabled: 14,
+    require_all_selected_keys: 15,
+  }
+}
