@@ -789,6 +789,20 @@ newtype! {
   /// The term "native" here means "low-active". In other words, `false` ==
   /// "pressed", and `true` is "released".
   ///
+  /// You probably actually want to have "normal" style key data, where `false`
+  /// == "released" and `true` == "pressed". To get this you must XOR the lower
+  /// 10 bits of the inner value:
+  ///
+  /// ```
+  /// # use gba_hal::data::*;
+  /// # let key_input = KeyInput::default();
+  /// let high_active_keys_value = key_input.0 ^ 0b11_1111_1111;
+  /// ```
+  ///
+  /// That's not provided by this crate because this crate sticks to minimal
+  /// declarations. You can of course use the [gba](https://docs.rs/gba) crate
+  /// for this and other helpful higher level abstractions.
+  ///
   /// The bits are as follows:
   ///
   /// * 0: a
@@ -801,7 +815,7 @@ newtype! {
   /// * 7: down
   /// * 8: r
   /// * 9: l
-  KeyInput, u16
+  KeyInput, pub u16
 }
 #[allow(missing_docs)]
 impl KeyInput {
