@@ -9,8 +9,6 @@ keywords = ["gba", "hal"]
 edition = "2018"
 license = "Apache-2.0"
 
-publish = false
-
 [dependencies]
 voladdress = "0.2"
 typenum = "1.10"
