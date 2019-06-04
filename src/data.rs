@@ -699,7 +699,6 @@ newtype_enum! {
   Fixed = 2,
 }
 
-#[allow(missing_docs)]
 newtype_enum! {
   /// Controls DMA starting time
   StartTiming = u16,
@@ -743,5 +742,355 @@ impl DMAControl {
     dma_start_time: 12-13=StartTiming<Immediately, VBlank, HBlank, Special>,
     irq_at_end: 14,
     dma_enable: 15,
+  }
+}
+
+newtype_enum! {
+  /// Controls DMA starting time
+  TimerTickRate = u8,
+  /// Once every CPU cycle
+  CPU1 = 0,
+  /// Once per 64 CPU cycles
+  CPU64 = 1,
+  /// Once per 256 CPU cycles
+  CPU256 = 2,
+  /// Once per 1,024 CPU cycles
+  CPU1024 = 3,
+}
+
+newtype! {
+  /// Controls one of the four Timer units.
+  ///
+  /// * 0-1: Tick however many CPU cycles
+  /// * 2: Instead of above, tick once per lower timer overflow (useless with
+  ///   Timer0).
+  /// * 6: Interrupt when this timer overflows
+  /// * 7: Enable bit.
+  ///
+  /// Each timer also has a "reload" (WO) and "counter" (RO). A timer's "reload"
+  /// value gets copied into the "counter" value every time that it overflows,
+  /// or any time that the enable bit goes from 0 to 1.
+  TimerControl, u8
+}
+#[allow(missing_docs)]
+impl TimerControl {
+  phantom_fields! {
+    self.0: u8,
+    tick_rate: 0-1=TimerTickRate<CPU1, CPU64, CPU256, CPU1024>,
+    cascade: 2,
+    overflow_irq: 6,
+    enabled: 7,
+  }
+}
+
+newtype! {
+  /// This is the GBA's _native_ key reading value.
+  ///
+  /// The term "native" here means "low-active". In other words, `false` ==
+  /// "pressed", and `true` is "released".
+  ///
+  /// You probably actually want to have "normal" style key data, where `false`
+  /// == "released" and `true` == "pressed". To get this you must XOR the lower
+  /// 10 bits of the inner value:
+  ///
+  /// ```
+  /// # use gba_hal::data::*;
+  /// # let key_input = KeyInput::default();
+  /// let high_active_keys_value = key_input.0 ^ 0b11_1111_1111;
+  /// ```
+  ///
+  /// That's not provided by this crate because this crate sticks to minimal
+  /// declarations. You can of course use the [gba](https://docs.rs/gba) crate
+  /// for this and other helpful higher level abstractions.
+  ///
+  /// The bits are as follows:
+  ///
+  /// * 0: a
+  /// * 1: b
+  /// * 2: select
+  /// * 3: start
+  /// * 4: right
+  /// * 5: left
+  /// * 6: up
+  /// * 7: down
+  /// * 8: r
+  /// * 9: l
+  KeyInput, pub u16
+}
+#[allow(missing_docs)]
+impl KeyInput {
+  phantom_fields! {
+    self.0: u16,
+    a_released: 0,
+    b_released: 1,
+    select_released: 2,
+    start_released: 3,
+    right_released: 4,
+    left_released: 5,
+    up_released: 6,
+    down_released: 7,
+    r_released: 8,
+    l_released: 9,
+  }
+}
+
+newtype! {
+  /// Affects when a key interrupt is triggered.
+  ///
+  /// This is intended for bringing the GBA out of the very-low-power mode, not
+  /// for general input.
+  ///
+  /// * There's one bit per button, matching the bits of the
+  ///   [KeyInput](KeyInput) type.
+  /// * 14: Key interrupts enabled
+  /// * 15: `true` if all selected keys must be pressed to trigger the interrupt
+  ///   (Logical AND), `false` if any selected key can be pressed to trigger the
+  ///   interrupt (Logical OR).
+  KeyControl, u16
+}
+#[allow(missing_docs)]
+impl KeyControl {
+  phantom_fields! {
+    self.0: u16,
+    a: 0,
+    b: 1,
+    select: 2,
+    start: 3,
+    right: 4,
+    left: 5,
+    up: 6,
+    down: 7,
+    r: 8,
+    l: 9,
+    irq_enabled: 14,
+    require_all_selected_keys: 15,
+  }
+}
+
+newtype! {
+  /// This controls what types of interrupts can fire.
+  ///
+  /// Note that for each type of interrupt given here, there's also an interrupt
+  /// flag in that item's IO control registers. For example, there's a VBlank
+  /// interrupt flag here, and another VBlank interrupt flag in the
+  /// [DisplayStatus](DisplayStatus). The locations vary by interrupt category.
+  ///
+  /// In any case, BOTH flags have to be set (as well as `IME`) for the
+  /// interrupt to _actually_ happen at the appropriate time.
+  ///
+  /// * 0: VBlank
+  /// * 1: HBlank
+  /// * 2: VCounter Match
+  /// * 3: Timer 0 Overflow
+  /// * 4: Timer 1 Overflow
+  /// * 5: Timer 2 Overflow
+  /// * 6: Timer 3 Overflow
+  /// * 7: Serial Communication
+  /// * 8: DMA 0 Completed
+  /// * 9: DMA 1 Completed
+  /// * 10: DMA 2 Completed
+  /// * 11: DMA 3 Completed
+  /// * 12: Keypad
+  /// * 13: Game Pak
+  InterruptEnable, u16
+}
+#[allow(missing_docs)]
+impl InterruptEnable {
+  phantom_fields! {
+    self.0: u16,
+    vblank: 0,
+    hblank: 1,
+    vcounter: 2,
+    timer0: 3,
+    timer1: 4,
+    timer2: 5,
+    timer3: 6,
+    serial: 7,
+    dma0: 8,
+    dma1: 9,
+    dma2: 10,
+    dma3: 11,
+    keypad: 12,
+    game_pak: 13,
+  }
+}
+
+newtype! {
+  /// Interrupt Requested Flags. GBATEK `IF` register.
+  ///
+  /// This has the same bit layout as the [InterruptEnable](InterruptEnable)
+  /// type, but this type is used to either check what interrupts are pending
+  /// (`IRQ_PENDING`) or acknowledge an interrupt as processed
+  /// (`IRQ_ACKNOWLEDGE`).
+  ///
+  /// It may seem strange, but to acknowledge an interrupt as having been
+  /// processed, you need to **set** that bit (and only that bit), even though
+  /// it's already an active bit.
+  ///
+  /// The full story of how to do interrupt handling properly is beyond the
+  /// scope of this comment, but that's the basics.
+  InterruptRequestFlags, u16
+}
+#[allow(missing_docs)]
+impl InterruptRequestFlags {
+  phantom_fields! {
+    self.0: u16,
+    vblank: 0,
+    hblank: 1,
+    vcounter: 2,
+    timer0: 3,
+    timer1: 4,
+    timer2: 5,
+    timer3: 6,
+    serial: 7,
+    dma0: 8,
+    dma1: 9,
+    dma2: 10,
+    dma3: 11,
+    keypad: 12,
+    game_pak: 13,
+  }
+}
+
+newtype! {
+  /// Color values on the GBA.
+  Color, pub u16
+}
+#[allow(missing_docs)]
+impl Color {
+  phantom_fields! {
+    self.0: u16,
+    red: 0-4,
+    green: 5-9,
+    blue: 10-14,
+  }
+}
+
+newtype! {
+  /// 0th part of an object's attributes.
+  ///
+  /// * Bits 0-7: row-coordinate
+  /// * Bits 8-9: Rendering style: Normal, Affine, Disabled, Double Area Affine
+  /// * Bits 10-11: Object mode: Normal, SemiTransparent, Object Window
+  /// * Bit 12: Mosaic
+  /// * Bit 13: is 8bpp
+  /// * Bits 14-15: Object Shape: Square, Horizontal, Vertical
+  OBJAttr0, u16
+}
+#[allow(missing_docs)]
+impl OBJAttr0 {
+  phantom_fields! {
+    self.0: u16,
+    row_coordinate: 0-7,
+    obj_rendering: 8-9=ObjectRender<Normal, Affine, Disabled, DoubleAreaAffine>,
+    obj_mode: 10-11=ObjectMode<Normal, SemiTransparent, OBJWindow>,
+    mosaic: 12,
+    is_8bpp: 13,
+    obj_shape: 14-15=ObjectShape<Square, Horizontal, Vertical>,
+  }
+}
+
+/// What style of rendering for this object
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u16)]
+pub enum ObjectRender {
+  /// Standard, non-affine rendering
+  Normal = 0,
+  /// Affine rendering
+  Affine = 1,
+  /// Object disabled (saves cycles for elsewhere!)
+  Disabled = 2,
+  /// Affine with double render space (helps prevent clipping)
+  DoubleAreaAffine = 3,
+}
+
+/// What mode to ues for the object.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u16)]
+pub enum ObjectMode {
+  /// Show the object normally
+  Normal = 0,
+  /// The object becomes the "Alpha Blending 1st target" (see Alpha Blending)
+  SemiTransparent = 1,
+  /// Use the object's non-transparent pixels as part of a mask for the object
+  /// window (see Windows).
+  OBJWindow = 2,
+}
+
+/// What shape the object's appearance should be.
+///
+/// The specifics also depend on the `ObjectSize` set.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u16)]
+pub enum ObjectShape {
+  /// Equal parts wide and tall
+  Square = 0,
+  /// Wider than tall
+  Horizontal = 1,
+  /// Taller than wide
+  Vertical = 2,
+}
+
+newtype! {
+  /// 1st part of an object's attributes.
+  ///
+  /// * Bits 0-8: column coordinate
+  /// * Bits 9-13:
+  ///   * Normal render: Bit 12 holds hflip and 13 holds vflip.
+  ///   * Affine render: The affine parameter selection.
+  /// * Bits 14-15: Object Size
+  OBJAttr1, u16
+}
+#[allow(missing_docs)]
+impl OBJAttr1 {
+  phantom_fields! {
+    self.0: u16,
+    col_coordinate: 0-8,
+    affine_index: 9-13,
+    hflip: 12,
+    vflip: 13,
+    obj_size: 14-15=ObjectSize<Zero, One, Two, Three>,
+  }
+}
+
+/// The object's size.
+///
+/// Also depends on the `ObjectShape` set.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u16)]
+pub enum ObjectSize {
+  /// * Square: 8x8px
+  /// * Horizontal: 16x8px
+  /// * Vertical: 8x16px
+  Zero = 0,
+  /// * Square: 16x16px
+  /// * Horizontal: 32x8px
+  /// * Vertical: 8x32px
+  One = 1,
+  /// * Square: 32x32px
+  /// * Horizontal: 32x16px
+  /// * Vertical: 16x32px
+  Two = 2,
+  /// * Square: 64x64px
+  /// * Horizontal: 64x32px
+  /// * Vertical: 32x64px
+  Three = 3,
+}
+
+newtype! {
+  /// 2nd part of an object's attributes.
+  ///
+  /// * Bits 0-9: Base Tile Index (tile offset from CBB4)
+  /// * Bits 10-11: Priority
+  /// * Bits 12-15: Palbank (if using 4bpp)
+  OBJAttr2, u16
+}
+#[allow(missing_docs)]
+impl OBJAttr2 {
+  phantom_fields! {
+    self.0: u16,
+    tile_id: 0-9,
+    priority: 10-11,
+    palbank: 12-15,
   }
 }
